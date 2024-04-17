@@ -13,11 +13,13 @@ use App\Repository\ChocoblastRepository;
 
 class ChocoblastController extends AbstractController
 {
+    public function __construct(
+        private readonly ChocoblastService $chocoblastService){}
+
+
     #[Route('/chocoblast/add', name: 'app_chocoblast_add')]
     public function create(
-        Request $request,
-        ChocoblastService $chocoblastService
-    ): Response {
+        Request $request    ): Response {
 
         $chocoblast =new Chocoblast();
         //création du formulaire
@@ -29,7 +31,7 @@ class ChocoblastController extends AbstractController
             try {
                 //ajout du chocoblast en BDD
                 $chocoblast->setStatus(false);
-                $chocoblastService->create($chocoblast);
+                $this->chocoblastService->create($chocoblast);
             } catch (\Throwable $th) {
                 $this->addFlash("danger", $th->getMessage());
             }
@@ -40,17 +42,34 @@ class ChocoblastController extends AbstractController
     }
 
     #[Route('/chocoblast/all', name:'app_chocoblast_all')]
-    public function showAllChocoblast(ChocoblastService $chocoblastService):Response 
+    public function showAllChocoblast():Response 
     {
-        $chocoblasts = $chocoblastService->findActive();
+        $chocoblasts = $this->chocoblastService->findActiveOrNot(true);
 
         return $this->render('chocoblast/showAllChocoblast.html.twig', [
             'chocoblasts' => $chocoblasts,
         ]);
     }
+ 
+     #[Route('/chocoblast/all/inactive', name:'app_chocoblast_all_inactive')]
+     public function showAllChocoblastInactive(ChocoblastService $chocoblastService): Response
+     {
+         $chocoblasts = $chocoblastService->findActiveOrNot(false);
+ 
+         return $this->render('chocoblast/showAllChocoblastInactive.html.twig', [
+             'chocoblasts' => $chocoblasts,
+         ]);
+     }
+     #[Route('/chocoblast/activate/{id}', name: 'app_chocoblast_activate')]
+     public function activateChocoblast(int $id): Response
+     {
+         $chocoblast = $this->chocoblastService->findOneBy($id);
+ 
+         $chocoblast->setStatus(true);
+         $this->chocoblastService->update($chocoblast);
+ 
+         return $this->redirectToRoute('app_chocoblast_all_inactive');
+     }
 
-    #[Route('/chocoblast/exemple', name:'app_chocoblast_exemple')]
-    public function exemple(ChocoblastRepository $chocoblastRepository) {
-        dd($chocoblastRepository->countChocoblast());
-    }
+ 
 }

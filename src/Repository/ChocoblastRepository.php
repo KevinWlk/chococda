@@ -56,4 +56,11 @@ class ChocoblastRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getResult();
         }
+        public function findInactive(): array{
+            return $this->createQueryBuilder('c')
+            ->where('c.status = :status')
+            ->setParameter('status', false)
+            ->getQuery()
+            ->getResult();
+}
 }
