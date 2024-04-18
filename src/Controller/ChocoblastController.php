@@ -31,13 +31,18 @@ class ChocoblastController extends AbstractController
         //test si le formulaire est submit
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                
                 //ajout du chocoblast en BDD
                 $chocoblast->setStatus(false);
+                $chocoblast->setAuthor($this->getUser());
                 $this->chocoblastService->create($chocoblast);
-                $this->addFlash("Success", "Le chocoblast a été ajouté");
+                $msg = "Le compte a été ajouté";
+                $type = "success";
             } catch (\Throwable $th) {
-                $this->addFlash("danger", $th->getMessage());
-            }
+                $msg = $th->getMessage();
+                $type = "danger";
+            } 
+            $this->addFlash($type, $msg);
         }
         return $this->render('chocoblast/addChocoblast.html.twig', [
             'formulaire' => $form,
@@ -73,5 +78,36 @@ class ChocoblastController extends AbstractController
         $chocoblast->setStatus(true);
         $this->chocoblastService->update($chocoblast);
         return $this->redirectToRoute('app_chocoblast_all_inactive');
+    }
+    #[Route('/chocoblast/author', name:'app_chocoblast_author')]
+    public function topAuthor(): Response {
+        $topAuthor = ($this->chocoblastService->getCountChocoblastAuthor());
+        $json = $this->json($topAuthor);
+        return $this->render('chocoblast/topAuthorChocoblast.html.twig',[
+            'topAuthor' => $json->getContent(),
+        ]);
+    }
+    #[Route('/chocoblast/target', name:'app_chocoblast_target')]
+    public function topTarget(): Response {
+        $topTarget = ($this->chocoblastService->getCountChocoblastTarget());
+        $json = $this->json($topTarget);
+        return $this->render('chocoblast/topTargetChocoblast.html.twig',[
+            'topTarget' => $json->getContent(),
+        ]);
+    }
+    #[Route('/chocoblast/graph', name: 'app_chocoblast_graph')]
+    public function showAllGraph(): Response
+    {
+        $topAuthor = ($this->chocoblastService->getCountChocoblastAuthor());
+        $topTarget = ($this->chocoblastService->getCountChocoblastTarget());
+
+        $jsonAuthor = $this->json($topAuthor);
+        $jsonTarget = $this->json($topTarget);
+
+
+        return $this->render('chocoblast/showAllGraph.html.twig', [
+            'topAuthor' => $jsonAuthor->getContent(),
+            'topTarget' => $jsonTarget->getContent(),
+        ]);
     }
 }

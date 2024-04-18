@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Repository;
-
+use App\DTO\TopChocoblastTargetDTO;
+use App\DTO\TopChocoblastAuthorDTO;
 use App\Entity\Chocoblast;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -56,11 +57,20 @@ class ChocoblastRepository extends ServiceEntityRepository
                 ->getQuery()
                 ->getResult();
         }
-        public function findInactive(): array{
+        public function topChocoblastAuthor() {
             return $this->createQueryBuilder('c')
-            ->where('c.status = :status')
-            ->setParameter('status', false)
-            ->getQuery()
-            ->getResult();
-}
+                ->select('NEW App\DTO\TopChocoblastAuthorDTO(u.firstname, u.lastname, COUNT(u.id))')
+                ->innerJoin('c.author', 'u')
+                ->groupBy('u.id')
+                ->getQuery()
+                ->getResult();
+        }
+        public function topChocoblastTarget() {
+            return $this->createQueryBuilder('c')
+                ->select('NEW App\DTO\TopChocoblastTargetDTO(u.firstname, u.lastname, COUNT(u.id))')
+                ->innerJoin('c.target', 'u')
+                ->groupBy('u.id')
+                ->getQuery()
+                ->getResult();
+        }
 }

@@ -57,5 +57,11 @@ class ChocoblastService implements ServiceInterface
     public function findInactive(): array{
         return $this->chocoblastRepository->findBy(["status"=>false])??throw new \Exception("Le chocoblast n'existe pas");
     }
+    public function getCountChocoblastAuthor(): array {
+        return $this->chocoblastRepository->topChocoblastAuthor();
+    }
+    public function getCountChocoblastTarget(): array {
+        return $this->chocoblastRepository->topChocoblastTarget();
+    }
     
 }
