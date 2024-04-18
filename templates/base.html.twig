@@ -13,16 +13,7 @@
         {% endblock %}
     </head>
     <body>
-        <nav>
-            <ul>
-                <li><a href="{{ path('app_chocoblast_add') }}">Ajouter un Chocoblast</a></li>
-                <li><a href="{{ path('app_chocoblast_all') }}">Tous les Chocoblasts actifs</a></li>
-                <li><a href="{{ path('app_chocoblast_all_inactive') }}">Tous les Chocoblasts inactifs</a></li>
-
-
-            </ul>
-        </nav>
-        {% block body %}
-        {% endblock %}
+        {% include "_components/_navbar.html.twig" %}
+        {% block body %}{% endblock %}
     </body>
 </html>
